@@ -1,0 +1,6 @@
+export const LANDING = '/'
+export const CART = '/cart'
+export const CHECK_OUT = '/check-out'
+export const ORDER_SUCCESS= '/order-success'
+export const ORDER_FAIL= '/order-fail'
+export const ORDERS= '/orders'
