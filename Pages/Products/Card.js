@@ -1,11 +1,11 @@
 import React from 'react'
 
-const Landing = () => {
+const Card = () => {
     return (
         <div>
-            Landing
+            
         </div>
     )
 }
 
-export default Landing
+export default Card

@@ -1,11 +1,11 @@
 import React from 'react'
 
-const Landing = () => {
+const QuantityBar = () => {
     return (
         <div>
-            Landing
+            
         </div>
     )
 }
 
-export default Landing
+export default QuantityBar
