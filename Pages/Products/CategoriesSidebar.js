@@ -16,8 +16,9 @@ const CategoriesSidebar = ({
   return (
     <Container>
       <List>
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <ListItem
+            key={category + index}
             action
             onClick={() => setSelectedCategory(category)}
             active={selectedCategory === category}

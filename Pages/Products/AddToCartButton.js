@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Row, Col, Button as UnstyledButton } from "react-bootstrap";
+import { Button as UnstyledButton } from "react-bootstrap";
 import styled from "styled-components";
 
 const AddToCartButton = ({ id, addToCart = (f) => f }) => {

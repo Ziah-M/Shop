@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import CategoriesSidebar from "./CategoriesSidebar";
 import Card from "./Card";
 import { Container, Row, Col, Button } from "react-bootstrap";
+import {withProductService, withCartService} from '../../Services'
+import { compose } from "recompose";
 
 const DEFAULT_PRODUCTS = [];
 
@@ -14,7 +16,7 @@ const Products = ({
   setSelectedCategory = (f) => f,
   getCartQty = (f) => f,
 }) => {
-  // TODO
+  // TODO --- note, MOVE THIS UP TO THE withProductService HOC?
   // Should 1. Filter out products not matching selectedCategory
   // 2. map over the products and append the cartQty using getCartQty(id)
   const filteredProducts = products;
@@ -46,4 +48,4 @@ const Products = ({
   );
 };
 
-export default Products;
+export default compose(withCartService, withProductService)(Products);
