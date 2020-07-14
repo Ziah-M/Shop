@@ -5,7 +5,7 @@ import ProductQuantity from "./QuantityBar";
 import styled from "styled-components";
 
 const ProductCard = ({
-  product: { uid: id, name, price = "$0.00", imageUrl = "" },
+  product: { uid: id, title:name, price = "$0.00", imageUrl = "" },
   cartQty = 0,
   addToCart = (f) => f,
   removeFromCart = (f) => f,
