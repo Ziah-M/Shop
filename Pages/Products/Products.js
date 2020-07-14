@@ -5,21 +5,17 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 import {withProductService, withCartService} from '../../Services'
 import { compose } from "recompose";
 
-const DEFAULT_PRODUCTS = [];
-
 const Products = ({
-  products = DEFAULT_PRODUCTS,
+  productsMatchingCategory:products,
   productCategories:categories,
   addToCart = (f) => f,
   removeFromCart = (f) => f,
   selectedCategory,
-  setSelectedCategory = (f) => f,
+  setSelectedProductCategory:setSelectedCategory = (f) => f,
   getCartQty = (f) => f,
 }) => {
-  // TODO --- note, MOVE THIS UP TO THE withProductService HOC?
-  // Should 1. Filter out products not matching selectedCategory
+  // TODO --- append cartQty for all products
   // 2. map over the products and append the cartQty using getCartQty(id)
-  const filteredProducts = products;
   return (
     <Container fluid>
       <Row>
@@ -32,7 +28,7 @@ const Products = ({
         </Col>
         <Col>
           <Row>
-            {filteredProducts.map((product, index) => (
+            {products.map((product, index) => (
               <Col key={index} lg={3} md={6}>
                 <Card
                   addToCart={addToCart}

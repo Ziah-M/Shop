@@ -5,10 +5,7 @@ import ProductQuantity from "./QuantityBar";
 import styled from "styled-components";
 
 const ProductCard = ({
-  id,
-  name,
-  price = "$0.00",
-  imageUrl = "",
+  product: { uid: id, name, price = "$0.00", imageUrl = "" },
   cartQty = 0,
   addToCart = (f) => f,
   removeFromCart = (f) => f,
@@ -20,7 +17,7 @@ const ProductCard = ({
       <Img variant="top" src={imageUrl} alt={name} />
       <Card.Body>
         <Card.Title className="text-center">{name}</Card.Title>
-        <Card.Text className="text-center">{price}</Card.Text>
+        <Card.Text className="text-center">${price}</Card.Text>
       </Card.Body>
       <Footer>
         {cartQty <= 0 ? (
