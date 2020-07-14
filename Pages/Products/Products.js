@@ -29,7 +29,7 @@ const Products = ({
         <Col>
           <Row>
             {products.map((product, index) => (
-              <Col key={index} lg={3} md={6}>
+              <Col key={index} lg={4} md={6}>
                 <Card
                   addToCart={addToCart}
                   removeFromCart={removeFromCart}

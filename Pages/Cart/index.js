@@ -1,11 +1,6 @@
-import React from 'react'
+import Cart from "./Cart";
+import CartSummary from "./CartSummary";
 
-const index = () => {
-    return (
-        <div>
-            Cart
-        </div>
-    )
-}
+export default Cart;
 
-export default index
+export { CartSummary };

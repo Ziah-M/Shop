@@ -1,11 +1,5 @@
-import React from 'react'
+import Shipping from './Form'
 
-const index = () => {
-    return (
-        <div>
-            
-        </div>
-    )
+export {
+    Shipping
 }
-
-export default index

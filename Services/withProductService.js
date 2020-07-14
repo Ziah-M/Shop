@@ -104,7 +104,7 @@ const withProductService = (ComposedComponent) => {
 
     createNewProduct(product) {
       this.props.firebase.products().push(product);
-      // TODO -- enforce object creation to match a product model
+      // TODO -- enforce object creation to match product model
       //will trigger the products listener from populateProducts
     }
 

@@ -1,11 +1,3 @@
-import React from 'react'
+import CheckOut from './CheckOut'
 
-const index = () => {
-    return (
-        <div>
-            
-        </div>
-    )
-}
-
-export default index
+export default CheckOut
