@@ -9,7 +9,7 @@ const DEFAULT_PRODUCTS = [];
 
 const Products = ({
   products = DEFAULT_PRODUCTS,
-  categories,
+  productCategories:categories,
   addToCart = (f) => f,
   removeFromCart = (f) => f,
   selectedCategory,

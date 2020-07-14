@@ -18,12 +18,12 @@ const CategoriesSidebar = ({
       <List>
         {categories.map((category, index) => (
           <ListItem
-            key={category + index}
+            key={category.name + index}
             action
-            onClick={() => setSelectedCategory(category)}
-            active={selectedCategory === category}
+            onClick={() => setSelectedCategory(category.name)}
+            active={selectedCategory === category.name}
           >
-            {category}
+            {category.name}
           </ListItem>
         ))}
       </List>
