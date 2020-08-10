@@ -30,12 +30,35 @@ const withOrderService = (ComposedComponent) => {
     }
 
     placeOrder(shipping = {}) {
+      console.log(
+        "TODO -- place order not implmented. here is the shipping object:" +
+          Object.values(shipping)
+      );
+      return;
+      const uid = this.props.authUser.user.uid;
+      const order = {
+        userId: uid,
+        shipping: shipping,
+        cartItems: this.state.cartItems,
+      };
+      this.props.firebase
+        .orders(uid)
+        .push(order)
+        .then((res) => {
+          this.props.clearCart();
+          this.props.history.push(ROUTES.ORDER_SUCCESS);
+          // (TODO use order push (result.key) as a query parameter to have a custom
+          //  order success page that shows the order)
+        })
+        .catch((error) => this.props.history.push(ROUTES.ORDER_FAIL));
     }
 
     getOrdersByUser(userId) {
+      // Return array of order objects
     }
 
     getAllOrders() {
+      // Should return an array of user IDs with order objects
     }
 
     render() {

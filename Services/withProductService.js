@@ -111,7 +111,7 @@ const withProductService = (ComposedComponent) => {
     getProductById(productId) {
       const { products } = this.props;
 
-      return products.filter((p) => p.uid === productId);
+      return products.filter((p) => p.uid === productId)[0];
     }
 
     updateProductById(productId, product) {
@@ -135,6 +135,7 @@ const withProductService = (ComposedComponent) => {
         <ComposedComponent
           {...this.props}
           productsMatchingCategory={productsMatchingCategory}
+          getProductById={this.getProductById}
         />
       );
     }
