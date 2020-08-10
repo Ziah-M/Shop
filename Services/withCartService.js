@@ -1,11 +1,19 @@
 import React, { Component } from "react";
 import { withFirebase } from "../../../shared/Firebase";
 
-const INITIAL_STATE = { cart: {}, cartId: "" };
-
-const defaultCart = {
+const DEFAULT_CART = {
   dateCreated: new Date().getTime(),
-  items: {},
+  items: [
+    {
+      productId: "",
+      qty: 0,
+    },
+  ],
+};
+
+const INITIAL_STATE = {
+  cartId: "",
+  cart: DEFAULT_CART,
 };
 
 const withCartService = (ComposedComponent) => {
@@ -16,8 +24,9 @@ const withCartService = (ComposedComponent) => {
       this.state = {
         ...INITIAL_STATE,
       };
-      this.getOrCreateNewCart = this.getOrCreateNewCart.bind(this);
-      this.createNewCart = this.createNewCart.bind(this);
+
+      this.getCartOrCreateNewCart = this.getCartOrCreateNewCart.bind(this);
+      this.createNewCart = this.createAndListenToNewCart.bind(this);
       this.addToCart = this.addToCart.bind(this);
       this.removeFromCart = this.removeFromCart.bind(this);
       this.clearCart = this.clearCart.bind(this);
@@ -25,6 +34,7 @@ const withCartService = (ComposedComponent) => {
       this.updateCartItem = this.updateCartItem.bind(this);
       this.getCartItems = this.getCartItems.bind(this);
       this.getTotalPrice = this.getTotalPrice.bind(this);
+      this.listenToCart = this.listenToCart.bind(this);
 
       //TODO - DEBOUNCE UPDATE CART ITEM
     }
@@ -37,63 +47,58 @@ const withCartService = (ComposedComponent) => {
       this.props.firebase.cart(this.state.cartId).off();
     }
 
-    getOrCreateNewCart() {
-
+    getCartOrCreateNewCart() {
       const cartIdInLocalStorage = localStorage.getItem("cartid");
-      if (!cartIdInLocalStorage) {
-        console.log(
-          "FAIL! Didn't find a cartId in the local storage:  " +
-            cartIdInLocalStorage
-        );
-        this.createNewCart();
-      } else {
 
+      if (!cartIdInLocalStorage) {
+        console.log("Failed to find a cart ID in local storage");
+        this.createAndListenToNewCart();
+      } else {
         this.props.firebase
           .cart(cartIdInLocalStorage)
           .once("value", (snapshot) => {
             if (!snapshot.exists()) {
-
-              this.createNewCart(); 
+              console.log(
+                "Cart ID found in local storage was not found in firebase"
+              );
+              this.createAndListenToNewCart();
             } else {
- 
-              this.props.firebase
-                .cartItems(cartIdInLocalStorage)
-                .on("value", (snapshot) => {
-                  const cartObject = { ...snapshot.val() };
-                  console.log(
-             
-                  );
-                  this.setState({ cart: cartObject });
-                });
-              this.setState({ cartId: cartIdInLocalStorage });
+              this.listenToCart(cartIdInLocalStorage);
             }
           });
       }
     }
 
-    createNewCart() {
+    listenToCart(cartId) {
+      console.log("Listening to changes to cart: ", cartId, " in firebase");
+
+      this.props.firebase.cartItems(cartId).on("value", (snapshot) => {
+        const cartObject = { ...snapshot.val() };
+        this.setState({ cart: cartObject });
+      });
+      this.setState({ cartId });
+    }
+
+    createAndListenToNewCart() {
+      console.log("Creating new cart");
 
       const newCartReference = this.props.firebase
         .carts()
-        .push({ dateCreated: new Date().getTime() });
-      const newCartKey = newCartReference.getKey(); /
-      localStorage.setItem("cartid", newCartKey);
-      console.log("local storage was set to: ", localStorage.getItem("cartid"));
-      this.props.firebase.cartItems(newCartKey).on("value", (snapshot) => {
- 
-        const cartObject = { ...snapshot.val() };
+        .push({ DEFAULT_CART });
 
-        this.setState({ cart: cartObject });
-      });
-      this.setState({ cartId: newCartKey });
+      //Google's recommended best-practice for obtaining the key
+      const newCartId = newCartReference.getKey();
+
+      localStorage.setItem("cartid", newCartId);
+      this.listenToCart(newCartId);
     }
 
-    addToCart(product) {
-      this.updateCartItem(product, +1);
+    addToCart(productId) {
+      this.updateCartItem(productId, +1);
     }
 
-    removeFromCart(product) {
-      this.updateCartItem(product, -1);
+    removeFromCart(productId) {
+      this.updateCartItem(productId, -1);
     }
 
     clearCart() {
@@ -103,53 +108,43 @@ const withCartService = (ComposedComponent) => {
         .cartItems(cartId)
         .remove()
         .then(function () {
-       
+          console.log("Cart was cleared successfully");
         })
         .catch(function (error) {
-        
+          console.log("Failed to clear cart" + error.message);
         });
     }
 
-    updateCartItem(product, quantityChange) {
-      console.log("UPDATING CART NOW WITH: " + Object.values(product));
-      if (!!product.title) {
+    updateCartItem(productId='', quantityChange=0) {
+      const {cartId} = this.state;
+
         this.props.firebase
-          .cartItem(this.state.cartId, product.title)
+          .cartItem(cartId, productId)
           .once("value", (snapshot) => {
             if (!snapshot.exists()) {
               quantityChange > 0
                 ? this.props.firebase
-                    .cartItem(this.state.cartId, product.title)
-                    .set({ product, quantity: 1 })
-                :;
+                    .cartItem(cartId, productId)
+                    .set({ productId, qty: 1 })
+                : console.log(
+                    "Failed to remove item as it was not found in the cart"
+                  );
             } else {
               this.props.firebase
-                .cartItem(this.state.cartId, product.title)
-                .update({ quantity: snapshot.val().quantity + quantityChange });
+                .cartItem(cartId, productId)
+                .update({ qty: snapshot.val().qty + quantityChange });
             }
           });
-      } else {
       }
-    }
 
-    getQuantityInCart(productTitle) {
-      try {
-        return this.state.cart[productTitle].quantity;
-      } catch {
-        return 0;
-      }
-    }
+    getQuantityInCart(productId) {
+      const {cart} = this.state;
+      const foundInCart = cart.items.filter(
+        item => (item.productId === productId && item.qty>0)
+      )
 
-    getCartItems() {
-      const cartItems = Object.values(this.state.cart);
-      console.log("CART ITEMS IN GETCARTITEMS", cartItems);
-      return cartItems;
-    }
-
-    getTotalPrice(cartItems = []) {
-      return cartItems.reduce((acc, cur) => {
-        return acc + cur.quantity * cur.product.price;
-      }, 0);
+      if(!foundInCart) return 0;
+      return foundInCart.qty;
     }
 
     render() {
@@ -159,11 +154,8 @@ const withCartService = (ComposedComponent) => {
           {...this.state}
           addToCart={this.addToCart}
           removeFromCart={this.removeFromCart}
-          getQuantityInCart={this.getQuantityInCart}
+          getCartQty={this.getQuantityInCart}
           clearCart={this.clearCart}
-          getCartItems={this.getCartItems}
-          cartItems={this.getCartItems()}
-          totalPrice={this.getTotalPrice(this.getCartItems())}
         />
       );
     }
