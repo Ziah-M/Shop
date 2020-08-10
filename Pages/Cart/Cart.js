@@ -3,25 +3,23 @@ import { Button, Table, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import * as ROUTES from "../../Constants/routes";
 import QuantityBar from "../Products/QuantityBar";
-import { withCartService } from "../../Services";
+import { withCartService, withProductService } from "../../Services";
 import styled from "styled-components";
 
-const Cart = ({
-  items = [],
-  addToCart = (f) => f,
-  removeFromCart = (f) => f,
-  clearCart = (f) => f,
-  totalPrice = 0,
-}) => {
-  const totalQty = items.length;
+const Cart = (props) => {
+  var totalQty = 0;
+  var totalPrice=0;
+
+  props.cartItems.map(item => {
+    totalQty=totalQty+item.qty;
+    totalPrice=totalPrice+item.qty*props.getProductById(item.productId).price
+  })
+
   return (
     <Container fluid>
-      <Header totalQty={totalQty} clearCart={clearCart} />
+      <Header totalQty={totalQty} clearCart={props.clearCart} />
       <ItemsTable
-        items={items}
-        addToCart={addToCart}
-        removeFromCart={removeFromCart}
-        totalQty={totalQty}
+        {...props}
         totalPrice={totalPrice}
       />
     </Container>
@@ -33,9 +31,9 @@ const Header = ({ totalQty, clearCart }) => (
     <h1>Shopping Cart</h1>
     <p>
       You have {totalQty} items in your cart.
-      <Button onClick={clearCart} variant="danger" size="sm">
+      <ClearCartButton onClick={clearCart} variant="danger" size="sm">
         Clear Cart
-      </Button>
+      </ClearCartButton>
     </p>
   </>
 );
@@ -45,11 +43,11 @@ const ClearCartButton = styled(Button)`
 `;
 
 const ItemsTable = ({
-  items,
-  totalQty,
+  cartItems: items,
   totalPrice,
   addToCart,
   removeFromCart,
+  getProductById = f=>f
 }) => (
   <>
     <Table>
@@ -70,12 +68,14 @@ const ItemsTable = ({
         {!items
           ? ""
           : items.map((item) => {
-              if (!item.product || item.quantity < 1) return <div></div>; //avoid undefined + 0 quantity
+              if (!item || item.qty < 1) return <div></div>;
+              
+              const product = getProductById(item.productId)
               return (
                 <tr>
                   <td
                     style={{
-                      backgroundImage: `url(${item.product.imageUrl})` || "",
+                      backgroundImage: `url(${product.imageUrl})` || "",
                       width: "80px",
                       height: "80px",
                       borderRadius: "100%",
@@ -84,17 +84,17 @@ const ItemsTable = ({
                     }}
                     className="thumbnail"
                   ></td>
-                  <td>{item.product.title}</td>
+                  <td>{product.title}</td>
                   <td>
                     <QuantityBar
-                      product={item.product}
-                      qty={item.qty}
+                      id={product.uid}
+                      cartQty={item.qty}
                       addToCart={addToCart}
                       removeFromCart={removeFromCart}
                     />
                   </td>
                   <td className="text-right">
-                    $ {item.qty * item.product.price}
+                    $ {item.qty * product.price}
                   </td>
                 </tr>
               );
@@ -122,4 +122,4 @@ const ItemsTable = ({
   </>
 );
 
-export default withCartService(Cart);
+export default withCartService(withProductService(Cart));
