@@ -6,7 +6,7 @@ import styled from "styled-components";
 
 const ProductCard = ({
   product: { uid: id, title:name, price = "$0.00", imageUrl = "" },
-  cartQty = 0,
+  qty = 0,
   addToCart = (f) => f,
   removeFromCart = (f) => f,
 }) => {
@@ -20,12 +20,12 @@ const ProductCard = ({
         <Card.Text className="text-center">${price}</Card.Text>
       </Card.Body>
       <Footer>
-        {cartQty <= 0 ? (
-          <AddToCartButton />
+        {qty <= 0 ? (
+          <AddToCartButton id={id} addToCart={addToCart}/>
         ) : (
           <ProductQuantity
-            id={name}
-            cartQty={cartQty}
+            id={id}
+            cartQty={qty}
             addToCart={addToCart}
             removeFromCart={removeFromCart}
           />

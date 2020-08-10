@@ -1,10 +1,10 @@
 import React from "react";
 import {
   ListGroup as List,
-  ListGroupItem as UnstyledListItem,
   Container as UnstyledContainer,
 } from "react-bootstrap";
 import styled from "styled-components";
+import { ListItem } from "../../Components/List";
 
 const DEFAULT_CATEGORIES = ["All", "Dairy", "Savory", "Frozen"];
 
@@ -34,13 +34,6 @@ const CategoriesSidebar = ({
 const Container = styled(UnstyledContainer)`
   position: sticky;
   top: 80px;
-`;
-
-const ListItem = styled(UnstyledListItem)`
-  &.active {
-    background-color: #c1d62e;
-    border-color: #c1d62e;
-  }
 `;
 
 export default CategoriesSidebar;

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { withFirebase } from "../../../shared/Firebase";
+import {convertObjectToList} from './helperFunctions'
 
 const DEFAULT_CART = {
   dateCreated: new Date().getTime(),
@@ -70,7 +71,7 @@ const withCartService = (ComposedComponent) => {
     listenToCart(cartId) {
       console.log("Listening to changes to cart: ", cartId, " in firebase");
 
-      this.props.firebase.cartItems(cartId).on("value", (snapshot) => {
+      this.props.firebase.cart(cartId).on("value", (snapshot) => {
         const cartObject = { ...snapshot.val() };
         this.setState({ cart: cartObject });
       });
@@ -136,17 +137,19 @@ const withCartService = (ComposedComponent) => {
         });
     }
 
-    getQuantityInCart(productId) {
-      const { cart } = this.state;
-      const foundInCart = cart.items.filter(
-        (item) => item.productId === productId && item.qty > 0
-      );
+    getQuantityInCart(id) {
+      console.log('Obtaining quantity in Cart for: ',id)
+      const item = this.state.cart.items[id];
+      console.log(item)
+      
+      if (!item) return 0;
 
-      if (!foundInCart) return 0;
-      return foundInCart.qty;
+      return item.qty;
     }
 
     render() {
+      const cartItems = convertObjectToList(this.state.cart.items);
+      console.log(cartItems)
       return (
         <ComposedComponent
           {...this.props}
@@ -155,6 +158,7 @@ const withCartService = (ComposedComponent) => {
           removeFromCart={this.removeFromCart}
           getCartQty={this.getQuantityInCart}
           clearCart={this.clearCart}
+          cartItems={cartItems}
         />
       );
     }

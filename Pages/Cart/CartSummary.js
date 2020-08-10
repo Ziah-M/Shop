@@ -3,29 +3,31 @@ import {
   Card,
   Container,
   ListGroup as List,
-  ListGroupItem as ListItem,
 } from "react-bootstrap";
 import { withCartService } from "../../Services";
+import { ListItem } from "../../Components/List";
 
-const CartSummary = ({ items, totalPrice = 0 }) => {
+const CartSummary = ({ items, totalPrice = 0, totalQty=0, getProductById=f=>f }) => {
   return (
     <Container fluid>
       {items ? (
         <Card>
           <Card.Body>
-            <Card.Title>OrderSummary</Card.Title>
-            <Card.Text>You have {items.length} items in your cart.</Card.Text>
+            <Card.Title>Order Summary</Card.Title>
+            <Card.Text>You have {totalQty} items in your cart.</Card.Text>
             <List variant="flush">
-              {items.map((item) => (
+              {items.map((item) => {
+                const product = getProductById(item.productId)
+                return (
                 <ListItem>
                   <span>
-                    {item.qty} x {item.product.title}
+                    {item.qty} x {product.title}
                   </span>
                   <Container style={{ float: "right" }}>
-                    <span>${item.qty * item.product.price}</span>
+                    <span>${item.qty * product.price}</span>
                   </Container>
                 </ListItem>
-              ))}
+              )})}
               <ListItem>
                 <span>
                   <b>Total</b>

@@ -20,7 +20,7 @@ const Orders = ({ orders = DEFAULT_ORDERS }) => {
             <th></th>
           </tr>
           <tbody>
-            {Orders.map((order) => (
+            {orders.map((order) => (
               <tr>
                 <td>{order.shipping.name}</td>
                 <td>{order.datePlaced}</td>
